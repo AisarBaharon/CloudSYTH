@@ -1,0 +1,162 @@
+/* Global styles and design tokens
+  This file configures Tailwind and CSS variables for the project's theme.
+*/
+@import "tailwindcss";
+
+@theme {
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  
+  --font-sans: "Poppins", sans-serif;
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-glow: glow 2s ease-in-out infinite;
+  
+  @keyframes accordion-down {
+    from { height: 0 }
+    to { height: var(--radix-accordion-content-height) }
+  }
+  @keyframes accordion-up {
+    from { height: var(--radix-accordion-content-height) }
+    to { height: 0 }
+  }
+  @keyframes glow {
+    0%, 100% { box-shadow: 0 0 5px hsl(var(--primary) / 0.5), 0 0 10px hsl(var(--primary) / 0.3); }
+    50% { box-shadow: 0 0 20px hsl(var(--primary) / 0.8), 0 0 30px hsl(var(--primary) / 0.5); }
+  }
+}
+
+@layer base {
+  :root {
+    /* Dark Theme by default for "Technical/Modern" look */
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+
+    /* Purple/Blue Primary */
+    --primary: 263.4 70% 50.4%; /* Purple */
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 217.2 32.6% 17.5%; /* Dark Blue */
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 263.4 70% 50.4%;
+
+    --radius: 0.5rem;
+    
+    /* Custom Gold for highlights */
+    --gold: 48 100% 50%;
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    /* Subtle gradient background */
+    background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 50%, #020617 100%);
+    min-height: 100vh;
+  }
+}
+
+.text-gradient-gold {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-600;
+}
+
+.text-gradient-purple {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500;
+}
+
+.glow-primary {
+  box-shadow: 0 0 15px hsl(var(--primary) / 0.3);
+}
+
+.glow-gold {
+  box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
+}
+
+/* Glitch / scanline effects used by the InitialLoader component. */
+@keyframes glitch-jitter {
+  0% { transform: translate3d(0,0,0) skewX(0deg); }
+  10% { transform: translate3d(-2px,-1px,0) skewX(-0.8deg); }
+  20% { transform: translate3d(2px,0,0) skewX(0.6deg); }
+  30% { transform: translate3d(-1px,1px,0) skewX(-0.4deg); }
+  40% { transform: translate3d(0,0,0) skewX(0deg); }
+  100% { transform: translate3d(0,0,0) skewX(0deg); }
+}
+
+@keyframes glitch-shift {
+  0% { clip-path: inset(0 0 0 0); }
+  50% { clip-path: inset(30% 0 60% 0); transform: translateX(-6px); }
+  100% { clip-path: inset(0 0 0 0); transform: translateX(0); }
+}
+
+.loader-glitch {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(147,51,234,0.06), rgba(99,102,241,0.04));
+  mix-blend-mode: screen;
+  filter: blur(6px) saturate(120%);
+  animation: glitch-jitter 1.6s linear infinite;
+  pointer-events: none;
+}
+
+.glitch-lines {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    180deg,
+    rgba(255,255,255,0.00) 0px,
+    rgba(255,255,255,0.02) 1px,
+    rgba(255,255,255,0.00) 2px
+  );
+  opacity: 0.12;
+  transform-origin: left center;
+  animation: glitch-shift 2.8s ease-in-out infinite;
+  pointer-events: none;
+}

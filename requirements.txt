@@ -1,0 +1,118 @@
+# CloudSynthex Web App - Requirements (Node.js)
+# NOTE: For JavaScript projects, this file is informational. Use `bash setup.sh` (recommended)
+# or `npm ci` to install exact dependencies from package-lock.json.
+
+Runtime
+- Node.js >= 18.17.0 (recommended: 20 LTS)
+- npm >= 9 (bundled with Node.js)
+
+System
+- Modern web browser (Chrome, Edge, Firefox, Safari)
+
+Install
+- macOS/Linux: bash setup.sh
+- Windows (PowerShell): powershell -ExecutionPolicy Bypass -File .\setup.ps1
+- Or cross-platform: npm run setup (uses npm ci + asset generation)
+
+Dependencies (from package.json)
+- class-variance-authority: ^0.7.1
+# CloudSynthex Web App - Requirements (Node.js)
+# NOTE: For JavaScript projects, this file is informational. Use `bash setup.sh` (recommended)
+# or `npm ci` to install exact dependencies from package-lock.json.
+
+Runtime
+- Node.js >= 18.17.0 (recommended: 20 LTS)
+- npm >= 9 (bundled with Node.js)
+
+System
+- Modern web browser (Chrome, Edge, Firefox, Safari)
+
+Install (one-line commands your teammates can run after cloning)
+
+1) Clone the repo (replace <repo-url> with your repository url):
+
+```bash
+git clone <repo-url>
+cd cloudsynthex
+```
+
+2) macOS / Linux (recommended):
+
+```bash
+# Optional: use nvm to pick the Node version from .nvmrc
+if command -v nvm >/dev/null 2>&1; then
+	nvm install
+	nvm use
+fi
+
+# Run the bundled setup (installs exact deps and generates assets)
+bash setup.sh
+
+# Start dev server
+npm run dev
+```
+
+3) Windows (PowerShell):
+
+```powershell
+# From PowerShell (recommended):
+powershell -ExecutionPolicy Bypass -File .\setup.ps1
+
+# Or use the cross-platform npm helper (works in cmd/powershell/git-bash):
+npm run setup
+
+# Start dev server
+npm run dev
+```
+
+4) Quick/CI-friendly alternative (exact installs):
+
+```bash
+# installs exact versions from package-lock.json
+npm ci
+# generate icons/assets (postinstall runs this automatically too)
+npm run generate:icons
+# start dev server
+npm run dev
+```
+
+Dependencies (from package.json)
+- class-variance-authority: ^0.7.1
+- clsx: 2.1.1
+- framer-motion: ^12.23.26
+- lucide-react: ^0.562.0
+- react: 19.2.3
+- react-dom: 19.2.3
+- react-router-dom: ^7.11.0
+- sonner: ^2.0.7
+- tailwind-merge: 3.4.0
+
+DevDependencies
+- @tailwindcss/postcss: ^4.1.18
+- @tailwindcss/vite: 4.1.17
+- @types/node: ^22.0.0
+- @types/react: 19.2.7
+- @types/react-dom: 19.2.3
+- @vitejs/plugin-react: 5.1.1
+- autoprefixer: ^10.4.23
+- tailwindcss: 4.1.17
+- typescript: 5.9.3
+- vite: 7.2.4
+- vite-plugin-singlefile: 2.3.0
+- sharp: ^0.32.0
+
+Quick run
+- Dev server: npm run dev
+- Build: npm run build
+- Preview: npm run preview
+
+Windows notes
+- If Node.js isn’t installed, install Node 20 LTS:
+	- With winget: winget install --id OpenJS.NodeJS.LTS -e
+	- Or download: https://nodejs.org/en/download
+- Optional: Use nvm-windows to manage Node versions: https://github.com/coreybutler/nvm-windows
+
+Notes
+- `npm ci` is recommended for reproducible installs (CI and teammates).
+- `npm run setup` runs `npm ci` and generates assets; `setup.sh`/`setup.ps1` wrap the same flow with helpful messaging.
+- If you want a single README or CONTRIBUTING section instead, I can move these instructions there.

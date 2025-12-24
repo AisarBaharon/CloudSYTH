@@ -18,12 +18,14 @@ import {
 
 import { Footer } from "@/components/Footer";
 import { InitialLoader } from "@/components/InitialLoader";
+import { createDatabase as apiCreateDb, getMyDatabase, openNeo4jBrowser } from "@/services/DBservice";
 
 type DbInstance = {
   id: string;
   name: string;
   status: "creating" | "running";
-  port: number;
+  port: number; // bolt port
+  httpPort?: number; // http browser port
 };
 
 export function Dashboard() {
@@ -49,7 +51,7 @@ export function Dashboard() {
     }
   }, []);
 
-  const handleCreateDb = (e?: React.FormEvent) => {
+  const handleCreateDb = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!password) {
       toast.error("Please enter a password to create a database.");
@@ -59,23 +61,47 @@ export function Dashboard() {
     setIsCreating(true);
     setShowCreateForm(false);
 
-    const id = Math.random().toString(36).slice(2, 9);
-    const name = `db-${id}`;
-    const port = 7687 + instances.length;
 
-    const newInstance: DbInstance = { id, name, status: "creating", port };
-    setInstances(prev => [...prev, newInstance]);
-    setPassword("");
 
-    setTimeout(() => {
-      setInstances(prev => prev.map(i => (i.id === id ? { ...i, status: "running" } : i)));
-      toast.success(`Database "${name}" is ready.`);
+    try {
+      const res = await apiCreateDb({ neo4jPassword: password });
+      setPassword("");
+      if (!res.success || !res.data) {
+        toast.error(res.message || "Failed to create database");
+        setIsCreating(false);
+        return;
+      }
+      const { boltPort, httpPort, containerName } = res.data;
+      const id = Math.random().toString(36).slice(2, 9);
+      const name = containerName || `db-${id}`;
+      const newInstance: DbInstance = { id, name, status: "running", port: boltPort, httpPort };
+      setInstances(prev => [...prev, newInstance]);
+      toast.success(res.message || "Database is ready.");
+    } catch (err) {
+      toast.error("Network or server error");
+    } finally {
       setIsCreating(false);
-    }, 1800);
+    }
   };
 
-  const openNeo4j = () => {
-    window.open("https://neo4j.com/product/auradb/", "_blank");
+  const openNeo4j = async () => {
+    // Prefer fetching current info in case ports change
+    try {
+      const res = await getMyDatabase();
+      if (res.success && res.data?.httpPort) {
+        openNeo4jBrowser(res.data.httpPort);
+        return;
+      }
+      // Fallback: use first instance's httpPort if available
+      const inst = instances.find(i => i.httpPort);
+      if (inst?.httpPort) {
+        openNeo4jBrowser(inst.httpPort);
+      } else {
+        toast.error("No database found to open");
+      }
+    } catch {
+      toast.error("Unable to open Neo4j browser");
+    }
   };
 
   const handleLogout = () => {

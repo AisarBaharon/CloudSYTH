@@ -36,7 +36,7 @@ export function Navbar() {
           <div className="bg-primary/20 p-2 rounded-lg">
             <Database className="w-6 h-6 text-primary" />
           </div>
-          <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
+          <span className="text-xl font-bold bg-clip-text text-transparent bg-linear-to-r from-white to-gray-400">
             CloudSynthex
           </span>
         </Link>

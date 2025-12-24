@@ -75,6 +75,46 @@ export async function getMyDatabase(): Promise<{ success: boolean; message: stri
   return { success: true, message: data?.message ?? "Database info", data: info };
 }
 
+// Fetch all databases (historical) for the current user
+export async function getMyDatabases(): Promise<{ success: boolean; message: string; data?: DbInfo[] }>
+{
+  const res = await fetch(`${API_BASE_URL}/db/my-databases`, {
+    method: "GET",
+    headers: authHeaders(),
+  });
+
+  let data: any = {};
+  try { data = await res.json(); } catch {}
+
+  if (!res.ok) {
+    return { success: false, message: data?.message ?? `Fetch failed (${res.status})` };
+  }
+
+  // Expect data to be an array of DB info objects
+  const list: DbInfo[] = (data || []).map((d: any) => ({
+    containerName: d.containerName,
+    httpPort: d.httpPort,
+    boltPort: d.boltPort,
+    neo4jPassword: d.neo4jPassword,
+  }));
+
+  return { success: true, message: data?.message ?? "Databases fetched", data: list };
+}
+
+// Check whether the current user already has a database
+export async function getDbStatus(): Promise<{ success: boolean; hasDatabase: boolean; message?: string }>{
+  const res = await fetch(`${API_BASE_URL}/db/status`, {
+    method: "GET",
+    headers: authHeaders(),
+  });
+  let data: any = {};
+  try { data = await res.json(); } catch {}
+  if (!res.ok) {
+    return { success: false, hasDatabase: false, message: data?.message ?? `Status check failed (${res.status})` };
+  }
+  return { success: true, hasDatabase: Boolean(data?.hasDatabase), message: data?.message };
+}
+
 // Convenience: open Neo4j Browser for the user's DB
 export function openNeo4jBrowser(httpPort: number, path: string = "browser") {
   const url = `http://localhost:${httpPort}/${path}`; // Neo4j browser is at /browser

@@ -105,11 +105,11 @@
 }
 
 .text-gradient-gold {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-600;
+  @apply bg-clip-text text-transparent bg-linear-to-r from-yellow-400 to-amber-600;
 }
 
 .text-gradient-purple {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500;
+  @apply bg-clip-text text-transparent bg-linear-to-r from-purple-400 to-blue-500;
 }
 
 .glow-primary {

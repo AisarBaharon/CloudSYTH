@@ -18,7 +18,7 @@ import {
 
 import { Footer } from "@/components/Footer";
 import { InitialLoader } from "@/components/InitialLoader";
-import { createDatabase as apiCreateDb, getMyDatabase, openNeo4jBrowser } from "@/services/DBservice";
+import { createDatabase as apiCreateDb, getMyDatabase, getMyDatabases, getDbStatus, openNeo4jBrowser } from "@/services/DBservice";
 
 type DbInstance = {
   id: string;
@@ -49,6 +49,44 @@ export function Dashboard() {
     } catch (e) {
       // ignore
     }
+    // On mount, if user has existing DB(s), populate them on the dashboard
+    (async () => {
+      try {
+        const status = await getDbStatus();
+        if (status.success && status.hasDatabase) {
+          // Try to fetch multiple DBs (historical). If backend only supports a single DB, fall back to single fetch
+          const listRes = await getMyDatabases();
+          if (listRes.success && Array.isArray(listRes.data) && listRes.data.length > 0) {
+            const mapped = listRes.data.map(d => ({
+              id: d.containerName || `${d.boltPort}`,
+              name: d.containerName || `db-${d.boltPort}`,
+              status: "running" as const,
+              port: d.boltPort,
+              httpPort: d.httpPort,
+            }));
+            setInstances(mapped);
+            return;
+          }
+
+          // Fallback: single DB endpoint
+          const info = await getMyDatabase();
+          if (info.success && info.data) {
+            const d = info.data;
+            const id = d.containerName || `${d.boltPort}`;
+            const inst: DbInstance = {
+              id,
+              name: d.containerName || "my-neo4j",
+              status: "running",
+              port: d.boltPort,
+              httpPort: d.httpPort,
+            };
+            setInstances([inst]);
+          }
+        }
+      } catch {
+        // ignore status errors on mount
+      }
+    })();
   }, []);
 
   const handleCreateDb = async (e?: React.FormEvent) => {
@@ -85,22 +123,30 @@ export function Dashboard() {
   };
 
   const openNeo4j = async () => {
-    // Prefer fetching current info in case ports change
+    // If only a single open is needed, open the first running DB
     try {
+      const inst = instances.find(i => i.httpPort);
+      if (inst?.httpPort) {
+        openNeo4jBrowser(inst.httpPort);
+        return;
+      }
+      // As a last resort, try fetching a single db from the server
       const res = await getMyDatabase();
       if (res.success && res.data?.httpPort) {
         openNeo4jBrowser(res.data.httpPort);
         return;
       }
-      // Fallback: use first instance's httpPort if available
-      const inst = instances.find(i => i.httpPort);
-      if (inst?.httpPort) {
-        openNeo4jBrowser(inst.httpPort);
-      } else {
-        toast.error("No database found to open");
-      }
+      toast.error("No database found to open");
     } catch {
       toast.error("Unable to open Neo4j browser");
+    }
+  };
+
+  const openInstance = (inst: DbInstance) => {
+    if (inst.httpPort) {
+      openNeo4jBrowser(inst.httpPort);
+    } else {
+      toast.error("This database has no browser port available");
     }
   };
 
@@ -141,7 +187,7 @@ export function Dashboard() {
           <div className="flex items-center space-x-4 relative">
             <button
               onClick={() => setShowUserMenu(s => !s)}
-              className="flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500 hover:opacity-90 transition-opacity focus:outline-none"
+              className="flex items-center justify-center h-10 w-10 rounded-full bg-linear-to-tr from-purple-500 to-blue-500 hover:opacity-90 transition-opacity focus:outline-none"
             >
               <User className="w-5 h-5 text-white" />
             </button>
